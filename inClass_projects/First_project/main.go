@@ -42,6 +42,7 @@ func main() {
 
 		var target int = rand.IntN(rang)
 		var guess int
+		var score int = rang
 		fmt.Println("You can start guessing the number")
 		fmt.Scan(&guess)
 		i := 0
@@ -49,8 +50,10 @@ func main() {
 			if guess > rang || guess < 0 {
 				fmt.Printf("The number is between 0 and %d \n", rang)
 			} else if guess < target {
+				score = target - guess
 				fmt.Println("Too low")
 			} else {
+				score = guess - target
 				fmt.Println("Too high")
 			}
 			fmt.Scan(&guess)
@@ -59,6 +62,7 @@ func main() {
 			fmt.Printf("Congratulations *\\0/*, you guessed the number after %d attempts \n", i)
 		} else {
 			fmt.Printf("You didn't guess the number, the correct number was %d \n", target)
+			fmt.Printf("You were %d away from the correct number \n", score)
 		}
 
 		fmt.Println("It was fun, don't you think , do you want to play again ? type 'yes' if so ")
