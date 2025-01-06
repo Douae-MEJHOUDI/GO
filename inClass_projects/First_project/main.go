@@ -8,9 +8,8 @@ import (
 func main() {
 	var repeat bool = true
 	for repeat {
-		var rang int = 0
-		var choice int = 0
-		var nb_tries int = 0
+		var rang, choice, nb_tries int = 0, 0, 0
+
 		for rang == 0 {
 			fmt.Println("Please choose from the menu a level of difficulty and enter the number: \n 1.Easy \n 2.Medium \n 3. Hard")
 			fmt.Scan(&choice)
