@@ -1,1 +1,29 @@
-{"AverageAge":29.6,"AverageSalary":60100,"Youngest":["John","Bob","David","Mallory","Zara"],"Oldest":["Alice","Carol","Ivan"],"HighestPaid":["Alice","Eve","Ivan"],"LowestPaid":["David"],"CountByEducation":{"Bachelor's":9,"Master's":7,"PhD":4}}
+{
+ "AverageAge": 29.6,
+ "AverageSalary": 60100,
+ "Youngest": [
+  "John",
+  "Bob",
+  "David",
+  "Mallory",
+  "Zara"
+ ],
+ "Oldest": [
+  "Alice",
+  "Carol",
+  "Ivan"
+ ],
+ "HighestPaid": [
+  "Alice",
+  "Eve",
+  "Ivan"
+ ],
+ "LowestPaid": [
+  "David"
+ ],
+ "CountByEducation": {
+  "Bachelor's": 9,
+  "Master's": 7,
+  "PhD": 4
+ }
+}

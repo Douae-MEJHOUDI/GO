@@ -67,7 +67,7 @@ func main() {
 		CountByEducation: people.countByEducation(),
 	}
 
-	statsJson, err := json.Marshal(stats)
+	statsJson, err := json.MarshalIndent(stats, "", " ")
 	os.WriteFile("stats.json", statsJson, 0644)
 }
 
