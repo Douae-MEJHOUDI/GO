@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"package_example/hello/mathutils"
 	"simplemath/utils"
@@ -19,11 +21,24 @@ func main() {
 	res, err := mathutils.Devide(5, 0)
 	if err != nil {
 		log.Println(err)
-		log.Fatal("devision was not good")
 	} else {
 		log.Println(res)
 	}
 
+	str, err := formatDivision(5, 0)
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println(str)
+	}
 	log.Println(mathutils.Devide(5, 2))
 
+}
+
+func formatDivision(a, b int) (string, error) {
+	res, err := mathutils.Devide(a, b)
+	if err != nil {
+		return "", errors.New("error deviding :" + err.Error())
+	}
+	return fmt.Sprintf("%d / %d = %f", a, b, res), nil
 }
