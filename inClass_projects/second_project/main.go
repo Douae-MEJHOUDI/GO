@@ -32,6 +32,13 @@ func main() {
 
 	file, err := os.Open("people.json")
 
+	lastThing := func() {
+		fmt.Println("Closing file")
+		file.Close()
+	}
+
+	defer lastThing()
+
 	if err != nil {
 		fmt.Println("Error opening file")
 		return
@@ -68,7 +75,8 @@ func main() {
 	}
 
 	statsJson, err := json.MarshalIndent(stats, "", " ")
-	os.WriteFile("stats.json", statsJson, 0644)
+	_ = os.WriteFile("stats.json", statsJson, 0644)
+
 }
 
 func (p *People) averageAge() float64 {
