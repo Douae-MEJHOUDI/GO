@@ -74,11 +74,6 @@ func main() {
 		PayloadCapacity: 3000,
 	}
 
-	car.Details()
-	fmt.Println()
-	truck.Details()
-	fmt.Println()
-
 	PrintAll([]Printable{car, truck, truck2})
 
 	content := []Insurable{car, truck, truck2}
