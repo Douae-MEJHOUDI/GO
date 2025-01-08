@@ -1,0 +1,20 @@
+[
+   {
+     "Make": "A",
+     "Model": "A",
+     "Year": 2015,
+     "NumberOfDoors": 4
+   },
+   {
+     "Make": "B",
+     "Model": "B",
+     "Year": 2015,
+     "PayloadCapacity": 2000
+   },
+   {
+     "Make": "C",
+     "Model": "C",
+     "Year": 2015,
+     "PayloadCapacity": 3000
+   }
+ ]
