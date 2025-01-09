@@ -104,12 +104,18 @@ func (sh *StudentHandler) GetStudents(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("Get students")
 	students := sh.class.GetStudents()
 	// maybe we can create a function that return the answers in json format (it takes as params w, r and the data as interface), it would help to avoid repeating the same code
-	// JsonResponse(w, r, interface{})
-	// and we can do the same for error handling (a Jsonresponse and the interface would be the error)
+	// JsonResponse(w, r, interface{}, status code)
+	// and we can do the same for error handling (a Jsonresponse and the interface would be the error, and the status code would be the error code)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(students)
 
+}
+
+func JsonResponse(w http.ResponseWriter, r *http.Request, data interface{}, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
 }
 
 func (sh *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +124,7 @@ func (sh *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&student)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
-		//fmt.Printf("Decoding error: %v\n", err)
+		//fmt.Print("Decoding error")
 		return
 	}
 	//fmt.Println(student)
