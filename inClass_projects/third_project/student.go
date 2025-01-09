@@ -32,6 +32,7 @@ type Course struct {
 
 type Class struct {
 	students []Student
+	Count    int
 }
 
 type StudentHandler struct {
@@ -40,7 +41,7 @@ type StudentHandler struct {
 
 func main() {
 
-	Class := &Class{}
+	Class := &Class{Count: 0}
 	StudentHandler := &StudentHandler{class: Class}
 
 	http.HandleFunc("/students", StudentHandler.Students)
@@ -52,6 +53,7 @@ func main() {
 }
 
 func (c *Class) AddStudent(s Student) {
+	c.Count++
 	c.students = append(c.students, s)
 }
 
@@ -120,7 +122,7 @@ func (sh *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//fmt.Println(student)
-	student.Id = len(sh.class.students) + 1
+	student.Id = sh.class.Count + 1
 	sh.class.AddStudent(student)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
