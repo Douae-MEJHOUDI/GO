@@ -5,9 +5,8 @@ import (
 	"sync"
 )
 
-func Square(x int, wg *sync.WaitGroup) {
+func Square(x int) {
 	fmt.Printf("Square of %d is %d\n", x, x*x)
-	wg.Done()
 }
 
 func main() {
@@ -17,9 +16,12 @@ func main() {
 	listNumbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	for _, v := range listNumbers {
 		wg.Add(1)
-		go Square(v, &wg)
-	}
+		go func() {
+			defer wg.Done()
+			Square(v)
+		}()
 
+	}
 	wg.Wait()
 
 }
