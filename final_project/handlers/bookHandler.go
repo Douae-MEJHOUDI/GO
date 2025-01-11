@@ -118,17 +118,52 @@ func (handler *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *BookHandler) SearchBooks(w http.ResponseWriter, r *http.Request) {
-	var criteria mdl.SearchCriteria
-	err := json.NewDecoder(r.Body).Decode(&criteria)
-	if err != nil {
-		//http.Error(w, err.Error(), http.StatusBadRequest)
-		handler.JsonWriteResponse(w, http.StatusBadRequest, err.Error()+"here za3ma?")
-		return
+	query := r.URL.Query()
+
+	criteria := mdl.SearchCriteria{
+		Title:  query.Get("title"),
+		Author: query.Get("author"),
+	}
+	minPrice := query.Get("min_price")
+	if minPrice != "" {
+		price, err := strconv.ParseFloat(minPrice, 64)
+
+		if err != nil {
+			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid min_price")
+			return
+		}
+		criteria.MinPrice = &price
 	}
 
+	maxPrice := query.Get("max_price")
+	if maxPrice != "" {
+		price, err := strconv.ParseFloat(maxPrice, 64)
+
+		if err != nil {
+			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid max_price")
+			return
+		}
+		criteria.MaxPrice = &price
+	}
+
+	inStock := query.Get("in_stock")
+
+	if inStock != "" {
+		exists, err := strconv.ParseBool(inStock)
+		if err != nil {
+			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid in_stock")
+			return
+		}
+		criteria.InStock = &exists
+	}
+
+	genres := query.Get("genres")
+	if genres != "" {
+		criteria.Genres = strings.Split(genres, ",")
+	}
 	books, err := handler.Store.Books.SearchBooks(criteria)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -52,15 +52,56 @@ func (s *InMemoryBookStore) SearchBooks(criteria mdl.SearchCriteria) ([]mdl.Book
 	var results []mdl.Book
 
 	if criteria.IsEmpty() {
-		/*
-			for _, book := range s.books {
-				results = append(results, book)
-			}*/
 		return s.books, nil
 	}
 
 	for _, book := range s.books {
-		if s.matchesCriteria(book, criteria) {
+		matches := true
+
+		if criteria.Title != "" {
+			matches = matches && strings.Contains(
+				strings.ToLower(book.Title),
+				strings.ToLower(criteria.Title))
+		}
+		if criteria.Author != "" {
+			authorName := strings.ToLower(book.Author.FirstName + " " + book.Author.LastName)
+			matches = matches && strings.Contains(
+				authorName,
+				strings.ToLower(criteria.Author),
+			)
+		}
+
+		if criteria.MinPrice != nil {
+			matches = matches && book.Price >= *criteria.MinPrice
+		}
+
+		if criteria.MaxPrice != nil {
+			matches = matches && book.Price <= *criteria.MaxPrice
+		}
+
+		if len(criteria.Genres) > 0 {
+			exists := false
+
+			for _, genre := range criteria.Genres {
+				for _, bookGenre := range book.Genres {
+					if genre == bookGenre {
+						exists = true
+						break
+					}
+				}
+				if exists {
+					break
+				}
+			}
+			matches = matches && exists
+		}
+
+		if criteria.InStock != nil {
+			instock := book.Stock > 0
+			matches = matches && instock == *criteria.InStock
+		}
+
+		if matches {
 			results = append(results, book)
 		}
 	}
