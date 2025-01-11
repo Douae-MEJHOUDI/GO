@@ -9,6 +9,7 @@ var (
 	ErrFirstNameRequired = errors.New("first_name is required")
 	ErrLastNAmeRequired  = errors.New("last_name is required")
 	ErrBioRequired       = errors.New("bio is required")
+	ErrAuthorHasBooks    = errors.New("Author has books")
 )
 
 type Author struct {

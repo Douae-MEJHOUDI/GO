@@ -8,12 +8,14 @@ import (
 type InMemoryAuthorStore struct {
 	mu      sync.RWMutex
 	authors []mdl.Author
+	books   BookStore
 	nextID  int
 }
 
-func NewAuthorStore() *InMemoryAuthorStore {
+func NewAuthorStore(books BookStore) *InMemoryAuthorStore {
 	return &InMemoryAuthorStore{
 		authors: []mdl.Author{},
+		books:   books,
 		nextID:  1,
 	}
 }
@@ -49,36 +51,57 @@ func (s *InMemoryAuthorStore) UpdateAuthor(id int, author mdl.Author) (mdl.Autho
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	//author.ID = id
 	err := author.Validate()
 	if err != nil {
 		return mdl.Author{}, err
 	}
+	index := -1
 	for i, a := range s.authors {
 		if a.ID == id {
-			author.ID = id
-			s.authors[i] = author
-			return author, nil
+			index = i
 		}
 	}
 
-	return mdl.Author{}, mdl.ErrAuthorNotFound
+	if index == -1 {
+		return mdl.Author{}, mdl.ErrAuthorNotFound
+	}
+
+	author.ID = id
+	s.authors[index] = author
+	for _, book := range s.books.GetAllBooks() {
+		if book.Author.ID == id {
+			book.Author = author
+		}
+	}
+
+	return author, nil
 }
 
 func (s *InMemoryAuthorStore) DeleteAuthor(id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	//delete(s.authors, id)
+	authIndex := -1
 
 	for i, author := range s.authors {
 		if author.ID == id {
-			s.authors = append(s.authors[:i], s.authors[i+1:]...)
-			return nil
+			authIndex = i
+			break
 		}
 	}
 
-	return mdl.ErrAuthorNotFound
+	if authIndex == -1 {
+		return mdl.ErrAuthorNotFound
+	}
+
+	for _, book := range s.books.GetAllBooks() {
+		if book.Author.ID == id {
+			return mdl.ErrAuthorHasBooks
+		}
+	}
+
+	s.authors = append(s.authors[:authIndex], s.authors[authIndex+1:]...)
+	return nil
 }
 
 func (s *InMemoryAuthorStore) GetAllAuthors() ([]mdl.Author, error) {

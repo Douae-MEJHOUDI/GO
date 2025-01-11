@@ -8,10 +8,15 @@ type Stores struct {
 }
 
 func NewStores() *Stores {
-	return &Stores{
-		Books:     NewBookStore(),
-		Authors:   NewAuthorStore(),
-		Customers: NewCustomerStore(),
-		Orders:    NewOrderStore(),
-	}
+	stores := &Stores{}
+	authorStore := NewAuthorStore(nil)
+	bookStore := NewBookStore(authorStore)
+
+	authorStore.books = bookStore
+
+	stores.Authors = authorStore
+	stores.Books = bookStore
+	stores.Customers = NewCustomerStore()
+	stores.Orders = NewOrderStore()
+	return stores
 }

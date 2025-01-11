@@ -10,4 +10,5 @@ type BookStore interface {
 	UpdateBook(id int, book mdl.Book) (mdl.Book, error)
 	DeleteBook(id int) error
 	SearchBooks(criteria mdl.SearchCriteria) ([]mdl.Book, error)
+	GetAllBooks() []mdl.Book
 }

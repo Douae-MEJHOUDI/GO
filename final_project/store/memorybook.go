@@ -7,15 +7,17 @@ import (
 )
 
 type InMemoryBookStore struct {
-	mu     sync.RWMutex
-	books  []mdl.Book
-	nextID int
+	mu      sync.RWMutex
+	books   []mdl.Book
+	authors AuthorStore
+	nextID  int
 }
 
-func NewBookStore() *InMemoryBookStore {
+func NewBookStore(authors AuthorStore) *InMemoryBookStore {
 	return &InMemoryBookStore{
-		books:  []mdl.Book{},
-		nextID: 1,
+		books:   []mdl.Book{},
+		authors: authors,
+		nextID:  1,
 	}
 }
 
@@ -28,6 +30,13 @@ func (s *InMemoryBookStore) CreateBook(book mdl.Book) (mdl.Book, error) {
 	if err != nil {
 		return mdl.Book{}, err
 	}
+
+	realAuthor, err := s.authors.GetAuthor(book.Author.ID)
+	if err != nil {
+		return mdl.Book{}, err
+	}
+
+	book.Author = realAuthor
 
 	book.ID = s.nextID
 	s.books = append(s.books, book)
@@ -98,6 +107,13 @@ func (s *InMemoryBookStore) UpdateBook(id int, book mdl.Book) (mdl.Book, error) 
 		return mdl.Book{}, err
 	}
 
+	realAuthor, err := s.authors.GetAuthor(book.Author.ID)
+	if err != nil {
+		return mdl.Book{}, err
+	}
+
+	book.Author = realAuthor
+
 	for i, b := range s.books {
 		if b.ID == id {
 			book.ID = id
@@ -123,4 +139,10 @@ func (s *InMemoryBookStore) DeleteBook(id int) error {
 	}
 
 	return mdl.ErrBookNotFound
+}
+
+func (s *InMemoryBookStore) GetAllBooks() []mdl.Book {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.books
 }
