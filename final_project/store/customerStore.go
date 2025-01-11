@@ -9,4 +9,5 @@ type CustomerStore interface {
 	GetCustomer(id int) (mdl.Customer, error)
 	UpdateCustomer(id int, customer mdl.Customer) (mdl.Customer, error)
 	DeleteCustomer(id int) error
+	GetAllCustomers() ([]mdl.Customer, error)
 }

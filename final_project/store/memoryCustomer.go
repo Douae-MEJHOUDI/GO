@@ -77,3 +77,9 @@ func (s *InMemoryCustomerStore) DeleteCustomer(id int) error {
 
 	return mdl.ErrCustomerNotFound
 }
+
+func (s *InMemoryCustomerStore) GetAllCustomers() ([]mdl.Customer, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.customers, nil
+}

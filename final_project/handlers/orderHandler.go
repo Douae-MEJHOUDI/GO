@@ -127,3 +127,27 @@ func (handler *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request)
 
 	handler.JsonWriteResponse(w, http.StatusNoContent, nil)
 }
+
+func (handler *OrderHandler) OrdersHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		handler.GetOrders(w, r)
+	case "POST":
+		handler.CreateOrder(w, r)
+	default:
+		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, nil)
+	}
+}
+
+func (handler *OrderHandler) OrderHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		handler.GetOrder(w, r)
+	case "PUT":
+		handler.UpdateOrder(w, r)
+	case "DELETE":
+		handler.DeleteOrder(w, r)
+	default:
+		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, nil)
+	}
+}
