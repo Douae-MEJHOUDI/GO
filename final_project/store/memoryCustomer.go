@@ -8,10 +8,11 @@ import (
 type InMemoryCustomerStore struct {
 	mu        sync.RWMutex
 	customers []mdl.Customer
+	data      *DataManager
 	nextID    int
 }
 
-func NewCustomerStore() *InMemoryCustomerStore {
+func NewCustomerStore(data *DataManager) *InMemoryCustomerStore {
 	return &InMemoryCustomerStore{
 		customers: []mdl.Customer{},
 		nextID:    1,

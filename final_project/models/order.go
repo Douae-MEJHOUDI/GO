@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	ErrOrderNotFound   = errors.New("Order not found")
-	ErrEmptyOrder      = errors.New("empty order")
-	ErrInvalidQuantity = errors.New("invalid quantity")
-	ErrNoOrdersFound   = errors.New("No order exist yet")
+	ErrOrderNotFound         = errors.New("Order not found")
+	ErrEmptyOrder            = errors.New("empty order")
+	ErrInvalidQuantity       = errors.New("invalid quantity")
+	ErrNoOrdersFound         = errors.New("No order exist yet")
+	ErrOrderNotSavedInMemory = errors.New("order changes were not saved into memory")
 )
 
 type Order struct {

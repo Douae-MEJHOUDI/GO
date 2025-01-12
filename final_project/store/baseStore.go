@@ -16,14 +16,16 @@ func NewStores() (*Stores, error) {
 	}
 
 	stores := &Stores{}
+	customerStore := NewCustomerStore(data)
 	authorStore := NewAuthorStore(nil, data)
 	bookStore := NewBookStore(authorStore, data)
+	orderStore := NewOrderStore(bookStore, customerStore, data)
 
 	authorStore.books = bookStore
 
 	stores.Authors = authorStore
 	stores.Books = bookStore
-	stores.Customers = NewCustomerStore()
-	stores.Orders = NewOrderStore()
+	stores.Customers = customerStore
+	stores.Orders = orderStore
 	return stores, nil
 }
