@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	mdl "final_project/models"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type CustomerHandler struct {
@@ -18,7 +20,7 @@ func NewCustomerHandler(handler *Handler) *CustomerHandler {
 	}
 }
 
-func (handler *CustomerHandler) GetCustomers(w http.ResponseWriter, r *http.Request) {
+func (handler *CustomerHandler) GetCustomers(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	customers, err := handler.Store.Customers.GetAllCustomers()
 
 	if err != nil {
@@ -28,7 +30,7 @@ func (handler *CustomerHandler) GetCustomers(w http.ResponseWriter, r *http.Requ
 	handler.JsonWriteResponse(w, http.StatusOK, customers)
 }
 
-func (handler *CustomerHandler) GetCustomer(w http.ResponseWriter, r *http.Request) {
+func (handler *CustomerHandler) GetCustomer(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -51,7 +53,7 @@ func (handler *CustomerHandler) GetCustomer(w http.ResponseWriter, r *http.Reque
 
 }
 
-func (handler *CustomerHandler) CreateCustomer(w http.ResponseWriter, r *http.Request) {
+func (handler *CustomerHandler) CreateCustomer(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var customer mdl.Customer
 	err := json.NewDecoder(r.Body).Decode(&customer)
 	if err != nil {
@@ -68,7 +70,7 @@ func (handler *CustomerHandler) CreateCustomer(w http.ResponseWriter, r *http.Re
 	handler.JsonWriteResponse(w, http.StatusCreated, customer)
 }
 
-func (handler *CustomerHandler) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
+func (handler *CustomerHandler) UpdateCustomer(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -98,7 +100,7 @@ func (handler *CustomerHandler) UpdateCustomer(w http.ResponseWriter, r *http.Re
 	handler.JsonWriteResponse(w, http.StatusOK, customer)
 }
 
-func (handler *CustomerHandler) DeleteCustomer(w http.ResponseWriter, r *http.Request) {
+func (handler *CustomerHandler) DeleteCustomer(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -124,9 +126,9 @@ func (handler *CustomerHandler) DeleteCustomer(w http.ResponseWriter, r *http.Re
 func (handler *CustomerHandler) CustomersHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		handler.GetCustomers(w, r)
+		handler.withTimeout(10*time.Second, handler.GetCustomers)(w, r)
 	case "POST":
-		handler.CreateCustomer(w, r)
+		handler.withTimeout(10*time.Second, handler.CreateCustomer)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
@@ -135,11 +137,11 @@ func (handler *CustomerHandler) CustomersHandler(w http.ResponseWriter, r *http.
 func (handler *CustomerHandler) CustomerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		handler.GetCustomer(w, r)
+		handler.withTimeout(10*time.Second, handler.GetCustomer)(w, r)
 	case "PUT":
-		handler.UpdateCustomer(w, r)
+		handler.withTimeout(10*time.Second, handler.UpdateCustomer)(w, r)
 	case "DELETE":
-		handler.DeleteCustomer(w, r)
+		handler.withTimeout(10*time.Second, handler.DeleteCustomer)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}

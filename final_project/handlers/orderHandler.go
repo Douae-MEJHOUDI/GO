@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	mdl "final_project/models"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type OrderHandler struct {
@@ -18,7 +20,7 @@ func NewOrderHandler(handler *Handler) *OrderHandler {
 	}
 }
 
-func (handler *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
+func (handler *OrderHandler) GetOrders(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	orders, err := handler.Store.Orders.GetAllOrders()
 
 	if err != nil {
@@ -29,7 +31,7 @@ func (handler *OrderHandler) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (handler *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
+func (handler *OrderHandler) GetOrder(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -54,7 +56,7 @@ func (handler *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	handler.JsonWriteResponse(w, http.StatusOK, order)
 }
 
-func (handler *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
+func (handler *OrderHandler) CreateOrder(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var order mdl.Order
 	err := json.NewDecoder(r.Body).Decode(&order)
 	if err != nil {
@@ -75,7 +77,7 @@ func (handler *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request)
 	handler.JsonWriteResponse(w, http.StatusCreated, order)
 }
 
-func (handler *OrderHandler) UpdateOrder(w http.ResponseWriter, r *http.Request) {
+func (handler *OrderHandler) UpdateOrder(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -105,7 +107,7 @@ func (handler *OrderHandler) UpdateOrder(w http.ResponseWriter, r *http.Request)
 	handler.JsonWriteResponse(w, http.StatusOK, order)
 }
 
-func (handler *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+func (handler *OrderHandler) DeleteOrder(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -131,9 +133,9 @@ func (handler *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request)
 func (handler *OrderHandler) OrdersHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		handler.GetOrders(w, r)
+		handler.withTimeout(10*time.Second, handler.GetOrders)(w, r)
 	case "POST":
-		handler.CreateOrder(w, r)
+		handler.withTimeout(10*time.Second, handler.CreateOrder)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, nil)
 	}
@@ -142,11 +144,11 @@ func (handler *OrderHandler) OrdersHandler(w http.ResponseWriter, r *http.Reques
 func (handler *OrderHandler) OrderHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		handler.GetOrder(w, r)
+		handler.withTimeout(10*time.Second, handler.GetOrder)(w, r)
 	case "PUT":
-		handler.UpdateOrder(w, r)
+		handler.withTimeout(10*time.Second, handler.UpdateOrder)(w, r)
 	case "DELETE":
-		handler.DeleteOrder(w, r)
+		handler.withTimeout(10*time.Second, handler.DeleteOrder)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, nil)
 	}

@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	mdl "final_project/models"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AuthorHandler struct {
@@ -18,7 +20,7 @@ func NewAuthorHandler(handler *Handler) *AuthorHandler {
 	}
 }
 
-func (handler *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
+func (handler *AuthorHandler) CreateAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var author mdl.Author
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
@@ -38,7 +40,7 @@ func (handler *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Reques
 	handler.JsonWriteResponse(w, http.StatusCreated, author)
 }
 
-func (handler *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
+func (handler *AuthorHandler) GetAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -62,7 +64,7 @@ func (handler *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) 
 	handler.JsonWriteResponse(w, http.StatusOK, author)
 }
 
-func (handler *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
+func (handler *AuthorHandler) UpdateAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -92,7 +94,7 @@ func (handler *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Reques
 	handler.JsonWriteResponse(w, http.StatusOK, author)
 }
 
-func (handler *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+func (handler *AuthorHandler) DeleteAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -115,7 +117,7 @@ func (handler *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Reques
 	handler.JsonWriteResponse(w, http.StatusOK, "Author deleted")
 }
 
-func (handler *AuthorHandler) GetAllAuthors(w http.ResponseWriter, r *http.Request) {
+func (handler *AuthorHandler) GetAllAuthors(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	authors, err := handler.Store.Authors.GetAllAuthors()
 	if err != nil {
 		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
@@ -128,9 +130,9 @@ func (handler *AuthorHandler) GetAllAuthors(w http.ResponseWriter, r *http.Reque
 func (handler *AuthorHandler) AuthorsRequestHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		handler.GetAllAuthors(w, r)
+		handler.withTimeout(10*time.Second, handler.GetAllAuthors)(w, r)
 	case http.MethodPost:
-		handler.CreateAuthor(w, r)
+		handler.withTimeout(10*time.Second, handler.CreateAuthor)(w, r)
 	default:
 		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
 	}
@@ -139,11 +141,11 @@ func (handler *AuthorHandler) AuthorsRequestHandler(w http.ResponseWriter, r *ht
 func (handler *AuthorHandler) AuthorRequestHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		handler.GetAuthor(w, r)
+		handler.withTimeout(10*time.Second, handler.GetAuthor)(w, r)
 	case http.MethodPut:
-		handler.UpdateAuthor(w, r)
+		handler.withTimeout(10*time.Second, handler.UpdateAuthor)(w, r)
 	case http.MethodDelete:
-		handler.DeleteAuthor(w, r)
+		handler.withTimeout(10*time.Second, handler.DeleteAuthor)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
