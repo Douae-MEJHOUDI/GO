@@ -5,13 +5,17 @@ import (
 	"final_project/service"
 	"final_project/store"
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
 	fmt.Println("Hello, World!")
 
-	stores := store.NewStores()
+	stores, err := store.NewStores()
+	if err != nil {
+		log.Println(err)
+	}
 	generator := service.NewGenerator(stores)
 
 	go generator.GenerateReport()

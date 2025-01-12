@@ -2,6 +2,7 @@ package store
 
 import (
 	mdl "final_project/models"
+	"log"
 	"sync"
 )
 
@@ -10,14 +11,39 @@ type InMemoryAuthorStore struct {
 	authors []mdl.Author
 	books   BookStore
 	nextID  int
+	data    *DataManager
 }
 
-func NewAuthorStore(books BookStore) *InMemoryAuthorStore {
-	return &InMemoryAuthorStore{
+type DataMAuthor struct {
+	Authors []mdl.Author `json:"authors`
+	NextID  int          `json: next_id`
+}
+
+func NewAuthorStore(bookstore BookStore, data *DataManager) *InMemoryAuthorStore {
+	store := &InMemoryAuthorStore{
 		authors: []mdl.Author{},
-		books:   books,
+		books:   bookstore,
 		nextID:  1,
+		data:    data,
 	}
+
+	var dataM DataMAuthor
+	err := data.LoadData("authors.json", &dataM)
+	if err != nil {
+		log.Printf("Failed to load authors: %v\n", err)
+	} else if len(dataM.Authors) > 0 {
+		store.authors = dataM.Authors
+		store.nextID = dataM.NextID
+	}
+	return store
+}
+
+func (s *InMemoryAuthorStore) saveAuthorData() error {
+	var dataM DataMAuthor
+	dataM.Authors = s.authors
+	dataM.NextID = s.nextID
+
+	return s.data.SaveData("authors.json", dataM)
 }
 
 func (s *InMemoryAuthorStore) CreateAuthor(author mdl.Author) (mdl.Author, error) {
@@ -30,6 +56,13 @@ func (s *InMemoryAuthorStore) CreateAuthor(author mdl.Author) (mdl.Author, error
 	author.ID = s.nextID
 	s.authors = append(s.authors, author)
 	s.nextID++
+
+	err = s.saveAuthorData()
+
+	if err != nil {
+		return mdl.Author{}, mdl.ErrAuthorNotSavedInMemory
+	}
+
 	return author, nil
 }
 
@@ -71,6 +104,12 @@ func (s *InMemoryAuthorStore) UpdateAuthor(id int, author mdl.Author) (mdl.Autho
 	for _, book := range s.books.GetAllBooks() {
 		if book.Author.ID == id {
 			book.Author = author
+			err = s.saveAuthorData()
+			if err != nil {
+				return mdl.Author{}, mdl.ErrAuthorNotSavedInMemory
+			}
+
+			return author, nil
 		}
 	}
 
@@ -101,6 +140,12 @@ func (s *InMemoryAuthorStore) DeleteAuthor(id int) error {
 	}
 
 	s.authors = append(s.authors[:authIndex], s.authors[authIndex+1:]...)
+	err := s.saveAuthorData()
+
+	if err != nil {
+		return mdl.ErrAuthorNotSavedInMemory
+	}
+
 	return nil
 }
 

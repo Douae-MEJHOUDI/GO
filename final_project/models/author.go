@@ -5,11 +5,12 @@ import (
 )
 
 var (
-	ErrAuthorNotFound    = errors.New("Author not found")
-	ErrFirstNameRequired = errors.New("first_name is required")
-	ErrLastNAmeRequired  = errors.New("last_name is required")
-	ErrBioRequired       = errors.New("bio is required")
-	ErrAuthorHasBooks    = errors.New("Author has books")
+	ErrAuthorNotFound         = errors.New("Author not found")
+	ErrFirstNameRequired      = errors.New("first_name is required")
+	ErrLastNAmeRequired       = errors.New("last_name is required")
+	ErrBioRequired            = errors.New("bio is required")
+	ErrAuthorHasBooks         = errors.New("Author has books")
+	ErrAuthorNotSavedInMemory = errors.New("Author changes were not saved into memory")
 )
 
 type Author struct {

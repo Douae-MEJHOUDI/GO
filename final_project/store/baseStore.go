@@ -1,5 +1,7 @@
 package store
 
+import "errors"
+
 type Stores struct {
 	Books     BookStore
 	Authors   AuthorStore
@@ -7,10 +9,15 @@ type Stores struct {
 	Orders    OrderStore
 }
 
-func NewStores() *Stores {
+func NewStores() (*Stores, error) {
+	data, err := NewDataManager("./data")
+	if err != nil {
+		return nil, errors.New("Problem in fetching data: " + err.Error())
+	}
+
 	stores := &Stores{}
-	authorStore := NewAuthorStore(nil)
-	bookStore := NewBookStore(authorStore)
+	authorStore := NewAuthorStore(nil, data)
+	bookStore := NewBookStore(authorStore, data)
 
 	authorStore.books = bookStore
 
@@ -18,5 +25,5 @@ func NewStores() *Stores {
 	stores.Books = bookStore
 	stores.Customers = NewCustomerStore()
 	stores.Orders = NewOrderStore()
-	return stores
+	return stores, nil
 }

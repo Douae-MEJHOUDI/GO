@@ -1,0 +1,22 @@
+{
+    "Books": [
+       {
+          "id": 1,
+          "title": "world",
+          "author": {
+             "id": 2,
+             "first_name": "B",
+             "last_name": "B",
+             "bio": "B"
+          },
+          "genres": [
+             "history",
+             "fantasy"
+          ],
+          "published_at": "2006-01-02T15:04:05Z",
+          "price": 40.8,
+          "stock": 70
+       }
+    ],
+    "NextID": 2
+ }

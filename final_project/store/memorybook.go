@@ -2,6 +2,7 @@ package store
 
 import (
 	mdl "final_project/models"
+	"log"
 	"strings"
 	"sync"
 )
@@ -11,14 +12,40 @@ type InMemoryBookStore struct {
 	books   []mdl.Book
 	authors AuthorStore
 	nextID  int
+	data    *DataManager
 }
 
-func NewBookStore(authors AuthorStore) *InMemoryBookStore {
-	return &InMemoryBookStore{
+type DataMbook struct {
+	Books  []mdl.Book `json:"books`
+	NextID int        `json: next_id`
+}
+
+func NewBookStore(authors AuthorStore, data *DataManager) *InMemoryBookStore {
+	store := &InMemoryBookStore{
 		books:   []mdl.Book{},
 		authors: authors,
 		nextID:  1,
+		data:    data,
 	}
+
+	var dataM DataMbook
+
+	if err := data.LoadData("books.json", &dataM); err != nil {
+
+		log.Printf("Failed to load books: %v\n", err)
+	} else if len(dataM.Books) > 0 {
+		store.books = dataM.Books
+		store.nextID = dataM.NextID
+	}
+	return store
+}
+
+func (s *InMemoryBookStore) saveBookData() error {
+	var dataM DataMbook
+	dataM.Books = s.books
+	dataM.NextID = s.nextID
+
+	return s.data.SaveData("books.json", dataM)
 }
 
 func (s *InMemoryBookStore) CreateBook(book mdl.Book) (mdl.Book, error) {
@@ -41,6 +68,12 @@ func (s *InMemoryBookStore) CreateBook(book mdl.Book) (mdl.Book, error) {
 	book.ID = s.nextID
 	s.books = append(s.books, book)
 	s.nextID++
+
+	err = s.saveBookData()
+
+	if err != nil {
+		return mdl.Book{}, mdl.ErrBookNotSavedInMemory
+	}
 
 	return book, nil
 }
@@ -109,23 +142,6 @@ func (s *InMemoryBookStore) SearchBooks(criteria mdl.SearchCriteria) ([]mdl.Book
 	return results, nil
 }
 
-func (s *InMemoryBookStore) matchesCriteria(book mdl.Book, criteria mdl.SearchCriteria) bool {
-	if criteria.Title != "" && !strings.Contains(
-		strings.ToLower(book.Title),
-		strings.ToLower(criteria.Title)) {
-		return false
-	}
-	/*
-		if criteria.Author.FirstName != "" || criteria.Author.LastName != "" {
-			authorName := strings.ToLower(book.Author.FirstName + " " + book.Author.LastName)
-			if !strings.Contains(authorName, strings.ToLower(criteria.Author)) {
-				return false
-			}
-		}*/
-
-	return true
-}
-
 func (s *InMemoryBookStore) GetBook(id int) (mdl.Book, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -159,6 +175,11 @@ func (s *InMemoryBookStore) UpdateBook(id int, book mdl.Book) (mdl.Book, error) 
 		if b.ID == id {
 			book.ID = id
 			s.books[i] = book
+
+			err = s.saveBookData()
+			if err != nil {
+				return mdl.Book{}, mdl.ErrBookNotSavedInMemory
+			}
 			return book, nil
 
 		}
@@ -175,6 +196,10 @@ func (s *InMemoryBookStore) DeleteBook(id int) error {
 	for i, book := range s.books {
 		if book.ID == id {
 			s.books = append(s.books[:i], s.books[i+1:]...)
+			err := s.saveBookData()
+			if err != nil {
+				return mdl.ErrBookNotSavedInMemory
+			}
 			return nil
 		}
 	}

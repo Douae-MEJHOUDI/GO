@@ -1,0 +1,17 @@
+{
+    "Authors": [
+       {
+          "id": 1,
+          "first_name": "test1",
+          "last_name": "test1",
+          "bio": "testsss"
+       },
+       {
+          "id": 2,
+          "first_name": "B",
+          "last_name": "B",
+          "bio": "B"
+       }
+    ],
+    "NextID": 3
+ }

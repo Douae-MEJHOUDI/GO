@@ -6,13 +6,14 @@ import (
 )
 
 var (
-	ErrEmptyTitle     = errors.New("book title cannot be empty")
-	ErrInvalidPrice   = errors.New("book price must be greater than 0")
-	ErrInvalidStock   = errors.New("book stock cannot be negative")
-	ErrMissingAuthor  = errors.New("book must have an author")
-	ErrEmptyGenres    = errors.New("book must have at least one genre")
-	ErrInvalidPubDate = errors.New("publication date cannot be in the future")
-	ErrBookNotFound   = errors.New("book not found")
+	ErrEmptyTitle           = errors.New("book title cannot be empty")
+	ErrInvalidPrice         = errors.New("book price must be greater than 0")
+	ErrInvalidStock         = errors.New("book stock cannot be negative")
+	ErrMissingAuthor        = errors.New("book must have an author")
+	ErrEmptyGenres          = errors.New("book must have at least one genre")
+	ErrInvalidPubDate       = errors.New("publication date cannot be in the future")
+	ErrBookNotFound         = errors.New("book not found")
+	ErrBookNotSavedInMemory = errors.New("this book ws not saved in memory, it will be lost permanently after a server restart")
 )
 
 type Book struct {
