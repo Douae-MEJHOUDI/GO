@@ -55,8 +55,9 @@ func (s *InMemoryOrderStore) saveOrderData() error {
 func (s *InMemoryOrderStore) CreateOrder(order mdl.Order) (mdl.Order, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	err := order.Validate()
+	err := order.ValidateForCreate()
 	if err != nil {
+		//fmt.Println("here")
 		return mdl.Order{}, err
 	}
 	cust, err := s.customers.GetCustomer(order.Customer.ID)

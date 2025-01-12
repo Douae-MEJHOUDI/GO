@@ -53,3 +53,31 @@ func (oi *OrderItem) Validate() error {
 	}
 	return nil
 }
+
+func (o *Order) ValidateForCreate() error {
+	if o.Customer.ID <= 0 {
+		return errors.New("customer ID is required")
+	}
+
+	if len(o.Items) == 0 {
+		return ErrEmptyOrder
+	}
+
+	for _, item := range o.Items {
+		err := item.ValidateForCreate()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (oi *OrderItem) ValidateForCreate() error {
+	if oi.Book.ID <= 0 {
+		return errors.New("book ID is required")
+	}
+	if oi.Quantity <= 0 {
+		return ErrInvalidQuantity
+	}
+	return nil
+}
