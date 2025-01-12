@@ -25,6 +25,7 @@ func main() {
 	bookHandler := handlers.NewBookHandler(handler)
 	orderHandler := handlers.NewOrderHandler(handler)
 	customerHandler := handlers.NewCustomerHandler(handler)
+	reportHandler := handlers.NewReportHandler(handler, "./output-reports")
 
 	http.HandleFunc("/books", bookHandler.BooksRequestHandler)
 	http.HandleFunc("/books/", bookHandler.BookRequestHandler)
@@ -37,6 +38,9 @@ func main() {
 
 	http.HandleFunc("/customers", customerHandler.CustomersHandler)
 	http.HandleFunc("/customers/", customerHandler.CustomerHandler)
+
+	http.HandleFunc("/reports", reportHandler.ReportsRequestHandler)
+	http.HandleFunc("/reports/", reportHandler.ReportRequestHandler)
 
 	fmt.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", nil)
