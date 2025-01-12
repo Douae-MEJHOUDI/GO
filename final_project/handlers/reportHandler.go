@@ -16,6 +16,10 @@ type ReportHandler struct {
 	outputDir string
 }
 
+type reportExtractDate struct {
+	GeneratedAt time.Time `json:"generated_at"`
+}
+
 func NewReportHandler(handler *Handler, outputDir string) *ReportHandler {
 	return &ReportHandler{
 		Handler:   handler,
@@ -24,23 +28,24 @@ func NewReportHandler(handler *Handler, outputDir string) *ReportHandler {
 }
 
 func (h *ReportHandler) ListReports(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-
 	startDate := r.URL.Query().Get("start_date")
 	endDate := r.URL.Query().Get("end_date")
 
 	var startTime, endTime time.Time
 	var err error
+
 	if startDate != "" {
 		startTime, err = time.Parse("2006-01-02", startDate)
 		if err != nil {
-			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid start_date format")
+			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid start_date format. Use YYYY-MM-DD")
 			return
 		}
 	}
+
 	if endDate != "" {
 		endTime, err = time.Parse("2006-01-02", endDate)
 		if err != nil {
-			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid end_date format")
+			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid end_date format. Use YYYY-MM-DD")
 			return
 		}
 	}
@@ -63,15 +68,14 @@ func (h *ReportHandler) ListReports(ctx context.Context, w http.ResponseWriter, 
 		}
 
 		if startDate != "" || endDate != "" {
-			var report struct {
-				GeneratedAt time.Time `json:"generated_at"`
-			}
+			var report reportExtractDate
 			if err := json.Unmarshal(data, &report); err != nil {
 				continue
 			}
-
-			if (startDate != "" && report.GeneratedAt.Before(startTime)) ||
-				(endDate != "" && report.GeneratedAt.After(endTime)) {
+			if startDate != "" && report.GeneratedAt.Before(startTime) {
+				continue
+			}
+			if endDate != "" && report.GeneratedAt.After(endTime) {
 				continue
 			}
 		}
@@ -90,9 +94,9 @@ func (h *ReportHandler) GetReport(ctx context.Context, w http.ResponseWriter, r 
 	}
 
 	reportID := paths[2]
-	filePath := filepath.Join(h.outputDir, fmt.Sprintf("report_%s.json", reportID))
+	filename := fmt.Sprintf("report_%s.json", reportID)
 
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(filepath.Join(h.outputDir, filename))
 	if err != nil {
 		if os.IsNotExist(err) {
 			h.JsonWriteResponse(w, r, http.StatusNotFound, "Report not found")
@@ -102,8 +106,7 @@ func (h *ReportHandler) GetReport(ctx context.Context, w http.ResponseWriter, r 
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
+	h.JsonWriteResponse(w, r, http.StatusOK, json.RawMessage(data))
 }
 
 func (h *ReportHandler) ReportsRequestHandler(w http.ResponseWriter, r *http.Request) {

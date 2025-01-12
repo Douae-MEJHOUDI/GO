@@ -1,0 +1,31 @@
+{
+   "id": "REPORT_20250112230459",
+   "start_period": "2025-01-11T23:04:59.0249901+01:00",
+   "end_period": "2025-01-12T23:04:59.0249901+01:00",
+   "generated_at": "2025-01-12T23:04:59.0252464+01:00",
+   "total_revenue": 81.6,
+   "total_orders": 1,
+   "top_selling_books": [
+     {
+       "book": {
+         "id": 1,
+         "title": "world",
+         "author": {
+           "id": 2,
+           "first_name": "B",
+           "last_name": "B",
+           "bio": "B"
+         },
+         "genres": [
+           "history",
+           "fantasy"
+         ],
+         "published_at": "2006-01-02T15:04:05Z",
+         "price": 40.8,
+         "stock": 68
+       },
+       "quantity_sold": 2,
+       "revenue": 81.6
+     }
+   ]
+ }
