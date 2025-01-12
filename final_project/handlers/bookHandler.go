@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	mdl "final_project/models"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type BookHandler struct {
@@ -18,24 +20,26 @@ func NewBookHandler(handler *Handler) *BookHandler {
 	}
 }
 
-func (handler *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
+func (handler *BookHandler) CreateBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var book mdl.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		//http.Error(w, err.Error(), http.StatusBadRequest)
+		handler.JsonWriteResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	book, err = handler.Store.Books.CreateBook(book)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	handler.JsonWriteResponse(w, http.StatusCreated, book)
 }
 
-func (handler *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+func (handler *BookHandler) GetBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -60,7 +64,7 @@ func (handler *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	handler.JsonWriteResponse(w, http.StatusOK, book)
 }
 
-func (handler *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
+func (handler *BookHandler) UpdateBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -92,7 +96,7 @@ func (handler *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	handler.JsonWriteResponse(w, http.StatusOK, book)
 }
 
-func (handler *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+func (handler *BookHandler) DeleteBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
 		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
@@ -117,7 +121,7 @@ func (handler *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	handler.JsonWriteResponse(w, http.StatusOK, "Book deleted")
 }
 
-func (handler *BookHandler) SearchBooks(w http.ResponseWriter, r *http.Request) {
+func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	criteria := mdl.SearchCriteria{
@@ -173,9 +177,9 @@ func (handler *BookHandler) SearchBooks(w http.ResponseWriter, r *http.Request) 
 func (handler *BookHandler) BooksRequestHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		handler.CreateBook(w, r)
+		handler.withTimeout(10*time.Second, handler.CreateBook)(w, r)
 	case http.MethodGet:
-		handler.SearchBooks(w, r)
+		handler.withTimeout(10*time.Second, handler.SearchBooks)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
@@ -185,11 +189,11 @@ func (handler *BookHandler) BooksRequestHandler(w http.ResponseWriter, r *http.R
 func (handler *BookHandler) BookRequestHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		handler.GetBook(w, r)
+		handler.withTimeout(10*time.Second, handler.GetBook)(w, r)
 	case http.MethodPut:
-		handler.UpdateBook(w, r)
+		handler.withTimeout(10*time.Second, handler.UpdateBook)(w, r)
 	case http.MethodDelete:
-		handler.DeleteBook(w, r)
+		handler.withTimeout(10*time.Second, handler.DeleteBook)(w, r)
 	default:
 		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
