@@ -16,7 +16,58 @@
           "published_at": "2006-01-02T15:04:05Z",
           "price": 40.8,
           "stock": 66
+       },
+       {
+          "id": 0,
+          "title": "GO",
+          "author": {
+             "id": 1,
+             "first_name": "test1",
+             "last_name": "test1",
+             "bio": "testsss"
+          },
+          "genres": [
+             "Fiction",
+             "Adventure"
+          ],
+          "published_at": "2024-01-15T00:00:00Z",
+          "price": 29,
+          "stock": 100
+       },
+       {
+          "id": 1,
+          "title": "GO more",
+          "author": {
+             "id": 1,
+             "first_name": "test1",
+             "last_name": "test1",
+             "bio": "testsss"
+          },
+          "genres": [
+             "Fiction",
+             "Adventure"
+          ],
+          "published_at": "2024-01-15T00:00:00Z",
+          "price": 29,
+          "stock": 100
+       },
+       {
+          "id": 2,
+          "title": "GO more",
+          "author": {
+             "id": 1,
+             "first_name": "test1",
+             "last_name": "test1",
+             "bio": "testsss"
+          },
+          "genres": [
+             "Fiction",
+             "Adventure"
+          ],
+          "published_at": "2024-01-15T00:00:00Z",
+          "price": 29,
+          "stock": 100
        }
     ],
-    "next_id": 0
+    "next_id": 3
  }

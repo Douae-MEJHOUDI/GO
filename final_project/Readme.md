@@ -191,7 +191,7 @@ GET /books?title=great&min_price=20&max_price=50&in_stock=true
 
 ### Getting Reports
 ```http
-GET /reports?start_date=2024-01-01&end_date=2024-01-31
+GET /reports?start_date=2025-01-01&end_date=2025-01-31
 ```
 
 ## Data Persistence
