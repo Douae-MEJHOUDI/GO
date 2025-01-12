@@ -1,0 +1,13 @@
+2025/01/12 17:29:49 Method: GET, Path: /books, Status: 200, Duration: 0s
+2025/01/12 17:29:58 Method: GET, Path: /customers, Status: 200, Duration: 52.8µs
+2025/01/12 17:30:34 Method: POST, Path: /customers, Status: 400, Duration: 0s
+2025/01/12 17:30:58 Method: POST, Path: /customers, Status: 400, Duration: 0s
+2025/01/12 17:31:26 Method: GET, Path: /customers, Status: 200, Duration: 757.1µs
+2025/01/12 17:31:38 Method: GET, Path: /customers, Status: 200, Duration: 0s
+2025/01/12 17:31:52 Method: GET, Path: /customers, Status: 200, Duration: 0s
+2025/01/12 17:31:57 Method: GET, Path: /customers, Status: 200, Duration: 0s
+2025/01/12 17:32:04 Method: POST, Path: /customers, Status: 201, Duration: 0s
+2025/01/12 17:32:12 Method: GET, Path: /customers, Status: 200, Duration: 0s
+2025/01/12 17:32:53 Method: GET, Path: /orders, Status: 200, Duration: 0s
+2025/01/12 17:32:59 Method: POST, Path: /orders, Status: 400, Duration: 0s
+2025/01/12 17:34:17 Method: POST, Path: /orders, Status: 400, Duration: 0s

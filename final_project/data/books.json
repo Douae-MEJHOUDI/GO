@@ -1,5 +1,5 @@
 {
-    "Books": [
+    "books": [
        {
           "id": 1,
           "title": "world",
@@ -15,8 +15,8 @@
           ],
           "published_at": "2006-01-02T15:04:05Z",
           "price": 40.8,
-          "stock": 70
+          "stock": 68
        }
     ],
-    "NextID": 2
+    "next_id": 0
  }

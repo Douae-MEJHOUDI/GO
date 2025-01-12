@@ -148,12 +148,35 @@ Content-Type: application/json
 
 {
     "customer": {
-        "id": 1
+        "id": 1,
+        "name": "test cust",
+        "email": "cust@example.com",
+        "address": {
+            "street": "test street",
+            "city": "test city",
+            "state": "test state",
+            "postal_code": "12345",
+            "country": "test country"
+        }
     },
     "items": [
         {
             "book": {
-                "id": 1
+                "id": 1,
+                "title": "world",
+                "author": {
+                    "id": 2,
+                    "first_name": "B",
+                    "last_name": "B",
+                    "bio": "B"
+                },
+                "genres": [
+                    "history",
+                    "fantasy"
+                ],
+                "published_at": "2006-01-02T15:04:05Z",
+                "price": 40.8,
+                "stock": 70
             },
             "quantity": 2
         }
