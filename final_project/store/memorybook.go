@@ -16,8 +16,8 @@ type InMemoryBookStore struct {
 }
 
 type DataMbook struct {
-	Books  []mdl.Book `json:"books`
-	NextID int        `json: next_id`
+	Books  []mdl.Book `json:"books"`
+	NextID int        `json:"next_id"`
 }
 
 func NewBookStore(authors AuthorStore, data *DataManager) *InMemoryBookStore {

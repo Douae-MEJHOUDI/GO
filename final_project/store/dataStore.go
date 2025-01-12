@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,7 +17,7 @@ type DataManager struct {
 func NewDataManager(datadir string) (*DataManager, error) {
 	err := os.MkdirAll(datadir, 0755)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create data directory", err)
+		return nil, errors.New("failed to create data directory" + err.Error())
 	}
 
 	return &DataManager{
@@ -58,12 +59,12 @@ func (dm *DataManager) LoadData(filename string, data interface{}) error {
 	oldData, err := os.ReadFile(filepath)
 
 	if err != nil {
-		return fmt.Errorf("failed to read file", err)
+		return errors.New("failed to read file: " + err.Error())
 	}
 
 	err = json.Unmarshal(oldData, data)
 	if err != nil {
-		return fmt.Errorf("failed to Unmarshal, ", err)
+		return errors.New("failed to Unmarshal, " + err.Error())
 	}
 	return nil
 }

@@ -15,8 +15,8 @@ type InMemoryAuthorStore struct {
 }
 
 type DataMAuthor struct {
-	Authors []mdl.Author `json:"authors`
-	NextID  int          `json: next_id`
+	Authors []mdl.Author `json:"authors"`
+	NextID  int          `json:"next_id"`
 }
 
 func NewAuthorStore(bookstore BookStore, data *DataManager) *InMemoryAuthorStore {

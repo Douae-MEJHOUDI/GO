@@ -6,14 +6,16 @@ import (
 )
 
 var (
-	ErrCustomerNotFound   = errors.New(" customer not found")
-	ErrNameRequired       = errors.New(" name is required")
-	ErrEmailRequired      = errors.New(" email is required")
-	ErrStreetRequired     = errors.New(" street is required")
-	ErrCityRequired       = errors.New(" city is required")
-	ErrStateRequired      = errors.New(" state is required")
-	ErrPostalCodeRequired = errors.New(" postal_code is required")
-	ErrCountryRequired    = errors.New(" country is required")
+	ErrCustomerNotFound         = errors.New("customer not found")
+	ErrNameRequired             = errors.New("name is required")
+	ErrEmailRequired            = errors.New("email is required")
+	ErrStreetRequired           = errors.New("street is required")
+	ErrCityRequired             = errors.New("city is required")
+	ErrStateRequired            = errors.New("state is required")
+	ErrPostalCodeRequired       = errors.New("postal_code is required")
+	ErrCountryRequired          = errors.New("country is required")
+	ErrCustomerNotSavedInMemory = errors.New("customer changes were not saved into memory")
+	ErrCustomerHasOrders        = errors.New("can't delete cutomer with existing orders")
 )
 
 type Customer struct {

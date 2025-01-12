@@ -70,7 +70,7 @@ func (s *InMemoryOrderStore) CreateOrder(order mdl.Order) (mdl.Order, error) {
 	for i, item := range order.Items {
 		book, err := s.books.GetBook(item.Book.ID)
 		if err != nil {
-			return mdl.Order{}, fmt.Errorf("invalid book item: ", err.Error())
+			return mdl.Order{}, errors.New("invalid book item: " + err.Error())
 		}
 
 		if book.Stock < item.Quantity {
@@ -85,7 +85,7 @@ func (s *InMemoryOrderStore) CreateOrder(order mdl.Order) (mdl.Order, error) {
 		book.Stock -= item.Quantity
 		_, err := s.books.UpdateBook(book.ID, book)
 		if err != nil {
-			return mdl.Order{}, fmt.Errorf("failef to update book stock: ", err)
+			return mdl.Order{}, errors.New("failef to update book stock: " + err.Error())
 		}
 	}
 
