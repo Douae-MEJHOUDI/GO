@@ -25,24 +25,24 @@ func (handler *BookHandler) CreateBook(ctx context.Context, w http.ResponseWrite
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusBadRequest)
-		handler.JsonWriteResponse(w, http.StatusBadRequest, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	book, err = handler.Store.Books.CreateBook(book)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusCreated, book)
+	handler.JsonWriteResponse(w, r, http.StatusCreated, book)
 }
 
 func (handler *BookHandler) GetBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		//http.Error(w, "invalid URL", )
 		return
 	}
@@ -50,24 +50,24 @@ func (handler *BookHandler) GetBook(ctx context.Context, w http.ResponseWriter, 
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		//http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	book, err := handler.Store.Books.GetBook(id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusNotFound, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusNotFound, err.Error())
 		//http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, book)
+	handler.JsonWriteResponse(w, r, http.StatusOK, book)
 }
 
 func (handler *BookHandler) UpdateBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		//http.Error(w, "invalid URL", )
 		return
 	}
@@ -75,7 +75,7 @@ func (handler *BookHandler) UpdateBook(ctx context.Context, w http.ResponseWrite
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		//http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -93,13 +93,13 @@ func (handler *BookHandler) UpdateBook(ctx context.Context, w http.ResponseWrite
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, book)
+	handler.JsonWriteResponse(w, r, http.StatusOK, book)
 }
 
 func (handler *BookHandler) DeleteBook(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		//http.Error(w, "invalid URL", )
 		return
 	}
@@ -107,7 +107,7 @@ func (handler *BookHandler) DeleteBook(ctx context.Context, w http.ResponseWrite
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		//http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -118,7 +118,7 @@ func (handler *BookHandler) DeleteBook(ctx context.Context, w http.ResponseWrite
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, "Book deleted")
+	handler.JsonWriteResponse(w, r, http.StatusOK, "Book deleted")
 }
 
 func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWriter, r *http.Request) {
@@ -133,7 +133,7 @@ func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWrit
 		price, err := strconv.ParseFloat(minPrice, 64)
 
 		if err != nil {
-			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid min_price")
+			handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid min_price")
 			return
 		}
 		criteria.MinPrice = &price
@@ -144,7 +144,7 @@ func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWrit
 		price, err := strconv.ParseFloat(maxPrice, 64)
 
 		if err != nil {
-			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid max_price")
+			handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid max_price")
 			return
 		}
 		criteria.MaxPrice = &price
@@ -155,7 +155,7 @@ func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWrit
 	if inStock != "" {
 		exists, err := strconv.ParseBool(inStock)
 		if err != nil {
-			handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid in_stock")
+			handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid in_stock")
 			return
 		}
 		criteria.InStock = &exists
@@ -167,11 +167,11 @@ func (handler *BookHandler) SearchBooks(ctx context.Context, w http.ResponseWrit
 	}
 	books, err := handler.Store.Books.SearchBooks(criteria)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, books)
+	handler.JsonWriteResponse(w, r, http.StatusOK, books)
 }
 
 func (handler *BookHandler) BooksRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -181,7 +181,7 @@ func (handler *BookHandler) BooksRequestHandler(w http.ResponseWriter, r *http.R
 	case http.MethodGet:
 		handler.withTimeout(10*time.Second, handler.SearchBooks)(w, r)
 	default:
-		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		handler.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 
 }
@@ -195,6 +195,6 @@ func (handler *BookHandler) BookRequestHandler(w http.ResponseWriter, r *http.Re
 	case http.MethodDelete:
 		handler.withTimeout(10*time.Second, handler.DeleteBook)(w, r)
 	default:
-		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		handler.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }

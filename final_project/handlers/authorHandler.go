@@ -25,106 +25,106 @@ func (handler *AuthorHandler) CreateAuthor(ctx context.Context, w http.ResponseW
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusBadRequest)
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		return
 	}
 
 	author, err = handler.Store.Authors.CreateAuthor(author)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusInternalServerError, err.Error())
 
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusCreated, author)
+	handler.JsonWriteResponse(w, r, http.StatusCreated, author)
 }
 
 func (handler *AuthorHandler) GetAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		return
 	}
 
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		//http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	author, err := handler.Store.Authors.GetAuthor(id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusNotFound, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusNotFound, err.Error())
 		//http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, author)
+	handler.JsonWriteResponse(w, r, http.StatusOK, author)
 }
 
 func (handler *AuthorHandler) UpdateAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		return
 	}
 
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		return
 	}
 
 	var author mdl.Author
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	author, err = handler.Store.Authors.UpdateAuthor(id, author)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusNotFound, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusNotFound, err.Error())
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, author)
+	handler.JsonWriteResponse(w, r, http.StatusOK, author)
 }
 
 func (handler *AuthorHandler) DeleteAuthor(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid URL")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid URL")
 		return
 	}
 
 	arg_id := paths[2]
 	id, err := strconv.Atoi(arg_id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusBadRequest, "invalid ID")
+		handler.JsonWriteResponse(w, r, http.StatusBadRequest, "invalid ID")
 		return
 	}
 
 	err = handler.Store.Authors.DeleteAuthor(id)
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusNotFound, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusNotFound, err.Error())
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, "Author deleted")
+	handler.JsonWriteResponse(w, r, http.StatusOK, "Author deleted")
 }
 
 func (handler *AuthorHandler) GetAllAuthors(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	authors, err := handler.Store.Authors.GetAllAuthors()
 	if err != nil {
-		handler.JsonWriteResponse(w, http.StatusInternalServerError, err.Error())
+		handler.JsonWriteResponse(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	handler.JsonWriteResponse(w, http.StatusOK, authors)
+	handler.JsonWriteResponse(w, r, http.StatusOK, authors)
 }
 
 func (handler *AuthorHandler) AuthorsRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +134,7 @@ func (handler *AuthorHandler) AuthorsRequestHandler(w http.ResponseWriter, r *ht
 	case http.MethodPost:
 		handler.withTimeout(10*time.Second, handler.CreateAuthor)(w, r)
 	default:
-		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+		handler.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }
 
@@ -147,6 +147,6 @@ func (handler *AuthorHandler) AuthorRequestHandler(w http.ResponseWriter, r *htt
 	case http.MethodDelete:
 		handler.withTimeout(10*time.Second, handler.DeleteAuthor)(w, r)
 	default:
-		handler.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		handler.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }

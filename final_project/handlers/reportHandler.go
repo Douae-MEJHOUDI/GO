@@ -33,21 +33,21 @@ func (h *ReportHandler) ListReports(ctx context.Context, w http.ResponseWriter, 
 	if startDate != "" {
 		startTime, err = time.Parse("2006-01-02", startDate)
 		if err != nil {
-			h.JsonWriteResponse(w, http.StatusBadRequest, "Invalid start_date format")
+			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid start_date format")
 			return
 		}
 	}
 	if endDate != "" {
 		endTime, err = time.Parse("2006-01-02", endDate)
 		if err != nil {
-			h.JsonWriteResponse(w, http.StatusBadRequest, "Invalid end_date format")
+			h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid end_date format")
 			return
 		}
 	}
 
 	files, err := os.ReadDir(h.outputDir)
 	if err != nil {
-		h.JsonWriteResponse(w, http.StatusInternalServerError, "Failed to read reports directory")
+		h.JsonWriteResponse(w, r, http.StatusInternalServerError, "Failed to read reports directory")
 		return
 	}
 
@@ -79,13 +79,13 @@ func (h *ReportHandler) ListReports(ctx context.Context, w http.ResponseWriter, 
 		reports = append(reports, json.RawMessage(data))
 	}
 
-	h.JsonWriteResponse(w, http.StatusOK, reports)
+	h.JsonWriteResponse(w, r, http.StatusOK, reports)
 }
 
 func (h *ReportHandler) GetReport(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	paths := strings.Split(r.URL.Path, "/")
 	if len(paths) != 3 {
-		h.JsonWriteResponse(w, http.StatusBadRequest, "Invalid URL")
+		h.JsonWriteResponse(w, r, http.StatusBadRequest, "Invalid URL")
 		return
 	}
 
@@ -95,9 +95,9 @@ func (h *ReportHandler) GetReport(ctx context.Context, w http.ResponseWriter, r 
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			h.JsonWriteResponse(w, http.StatusNotFound, "Report not found")
+			h.JsonWriteResponse(w, r, http.StatusNotFound, "Report not found")
 		} else {
-			h.JsonWriteResponse(w, http.StatusInternalServerError, "Failed to read report")
+			h.JsonWriteResponse(w, r, http.StatusInternalServerError, "Failed to read report")
 		}
 		return
 	}
@@ -111,7 +111,7 @@ func (h *ReportHandler) ReportsRequestHandler(w http.ResponseWriter, r *http.Req
 	case http.MethodGet:
 		h.withTimeout(10*time.Second, h.ListReports)(w, r)
 	default:
-		h.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		h.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }
 
@@ -120,6 +120,6 @@ func (h *ReportHandler) ReportRequestHandler(w http.ResponseWriter, r *http.Requ
 	case http.MethodGet:
 		h.withTimeout(10*time.Second, h.GetReport)(w, r)
 	default:
-		h.JsonWriteResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		h.JsonWriteResponse(w, r, http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }
